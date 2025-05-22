@@ -198,3 +198,23 @@ save_period=10 \
 erasing=0.5
 
 
+# Sixth run, derivat din fine-tuning cu backbone inghetat de la fifth run. aceleasi seturi de date, alte comenzi
+
+yolo detect train \
+model=/workspace/fine-tune/runs/detect/yolo11x-glasses-fifth-run-just-head/weights/best.pt \
+data=glasses.yaml \
+epochs=50 \
+imgsz=960 \
+batch=16 \
+patience=15 \
+device=0 \
+freeze=backbone \
+name=yolo11x-glasses-sixth-run-just-head \
+half=True \
+save_json=True \
+mixup=0.1 \
+cutmix=0.05 \
+hsv_h=0.04 hsv_s=0.5 hsv_v=0.4 \
+cos_lr=True \
+save_period=10 \
+erasing=0.4
