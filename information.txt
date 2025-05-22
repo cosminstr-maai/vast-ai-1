@@ -1,0 +1,200 @@
+# First run - imagini train [5000:10000]
+
+yolo detect train \
+  model=yolo11x.pt \
+  data=glasses.yaml \
+  epochs=20 \
+  imgsz=768 \
+  batch=64 \
+  device=0,1 \
+  freeze=backbone \
+  multi_scale=True \
+  cos_lr=True \
+  name=yolo11x-glasses \
+  mixup=0.3 \
+  hsv_h=0.03 hsv_s=0.5 hsv_v=0.4 \
+  save_period=1
+  
+  
+Images Evaluated: 258
+
+Instances: 258
+
+Precision (P): 0.84
+
+Recall (R): 0.756
+
+mAP@0.5: 0.854 
+
+mAP@0.5:0.95: 0.449
+  
+  
+ # Second run - imagini train [10000:15000]
+  
+  yolo detect train \
+  model=runs/detect/yolo11x-glasses2/weights/best.pt \
+  data=glasses.yaml \
+  epochs=20 \
+  imgsz=768 \
+  batch=64 \
+  device=0,1 \
+  freeze=backbone \
+  multi_scale=True \
+  cos_lr=True \
+  name=yolo11x-glasses-second-run \
+  mixup=0.3 \
+  hsv_h=0.03 hsv_s=0.5 hsv_v=0.4 \
+
+
+Images Evaluated: 258
+
+Instances: 258
+
+Precision (P): 0.884
+
+Recall (R): 0.795
+
+mAP@0.5: 0.883
+
+mAP@0.5:0.95: 0.518
+
+# Third run - imagini train [15000:20000]
+
+yolo detect train \
+model=weights/best.pt \
+data=glasses.yaml \
+epochs=20 \
+imgsz=960 \
+batch=32 \
+device=0 \
+freeze=backbone \
+multi_scale=True \
+cos_lr=True \
+name=yolo11x-glasses-third-run \
+mixup=0.15 \
+hsv_h=0.03 hsv_s=0.5 hsv_v=0.4 \
+box=10.0 \
+cls=1.0  \
+erasing=0.2 \
+cutmix=0.1 \
+lrf=0.1 \ 
+save_json=True \ 
+augment=True
+
+yolo detect train \
+model=weights/best.pt \
+data=glasses.yaml \
+epochs=20 \
+imgsz=960 \
+batch=32 \
+device=0 \
+freeze=backbone \
+multi_scale=True \
+cos_lr=True \
+name=yolo11x-glasses-third-run \
+mixup=0.15 \
+hsv_h=0.03 hsv_s=0.5 hsv_v=0.4 \
+box=10.0 \
+cls=1.0  \
+erasing=0.2 \
+cutmix=0.1 \
+lrf=0.1 \ 
+save_json=True \ 
+augment=True
+
+# comanda finala / am scos din elemente deoarece erau prea multe, actualizam prin mai multe run-uri cate o bucata
+
+yolo detect train \
+model=weights/best.pt \
+data=glasses.yaml \
+epochs=20 \
+imgsz=960 \
+batch=32 \
+device=0 \
+freeze=backbone \
+name=yolo11x-glasses-third-run \
+half=True \
+save_json=True \
+mixup=0.15 \
+cutmix=0.1 \
+hsv_h=0.03 hsv_s=0.5 hsv_v=0.4 \
+erasing=0.2
+
+Precision (P)	0.880	~0.83	🔼 +0.05
+Recall (R)	0.814	~0.85	🔽 −0.036
+mAP@0.5	0.892	~0.88	🔼 +0.012
+mAP@0.5:0.95	0.501	~0.63	🔽 −0.129 ❗
+
+# Fourth run - imagini train [20000:35000] si val = [35000:36500] - se antreneaza si backbone-ul
+
+yolo detect train \
+model=runs/detect/yolo11x-glasses-third-run/weights/best.pt \
+data=glasses.yaml \
+epochs=50 \
+imgsz=960 \
+batch=32 \
+patience=20 \
+device=0 \
+freeze=0 \
+name=yolo11x-glasses-fourth-run\
+half=True \
+save_json=True \
+mixup=0.15 \
+cutmix=0.1 \
+hsv_h=0.03 hsv_s=0.5 hsv_v=0.4
+
+unfreeze la backbone sa vedem daca asta face bottleneck (mai multe epoci de antrenare de asemenea)
+
+# Fifth run (2 antrenari in paralel)
+
+O antrenare va fi continuarea cu backbone-ul dezghetat pe inca 15000 de poze train si 1500 de validation
+
+In acest context, train = [12500:27500] si val = [35000:36500]
+
+yolo detect train \
+model=/workspace/fine-tune/best.pt \
+data=glasses.yaml \
+epochs=50 \
+imgsz=960 \
+batch=32 \
+patience=15 \
+device=0 \
+freeze=0 \
+name=yolo11x-glasses-fifth-run-with-backbone \
+half=True \
+save_json=True \
+mixup=0.1 \
+cutmix=0.05 \
+hsv_h=0.03 hsv_s=0.5 hsv_v=0.4 \
+cos_lr=True \
+lr0=0.05 \
+warmup_epochs=5 \
+save_period=10
+
+
+Cealalta antrenare va fi fine tuning cu backbone-ul inghetat pe 5000 de poze si 1500 de validare
+
+In acest context, train = [0:5000] si val = [35000:36500]
+
+yolo detect train \
+model=/workspace/fine-tune/best.pt \
+data=glasses.yaml \
+epochs=30 \
+imgsz=960 \
+batch=16 \
+patience=15 \
+device=0 \
+freeze=backbone \
+name=yolo11x-glasses-fifth-run-just-head \
+half=True \
+save_json=True \
+mixup=0.1 \
+cutmix=0.05 \
+hsv_h=0.04 hsv_s=0.5 hsv_v=0.4 \
+cos_lr=True \
+lr0=0.05 \
+warmup_epochs=5 \
+save_period=10 \
+erasing=0.5
+
+

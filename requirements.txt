@@ -1,0 +1,12 @@
+ultralytics==8.3.125
+opencv-python
+matplotlib
+seaborn
+pandas
+numpy
+pyyaml
+tqdm
+scikit-learn
+torchvision
+pycocotools
+albumentations
